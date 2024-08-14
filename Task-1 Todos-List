@@ -1,0 +1,153 @@
+/* */
+
+
+import React, { useState, useEffect } from 'react';
+
+const TodosApp = () => {
+  const [todos, setTodos] = useState([]);
+  const [newTask, setNewTask] = useState("");
+  const [editId, setEditId] = useState(null);
+
+  // Load tasks from localStorage when the component mounts
+  useEffect(() => {
+    const savedTodos = JSON.parse(localStorage.getItem('todos'));
+    if (savedTodos) {
+      setTodos(savedTodos);
+    }
+  }, []);
+
+  // Function to handle adding a new task or updating an existing task
+  const handleAddOrUpdateTask = () => {
+    if (newTask.trim() === "") return;
+
+    if (editId) {
+      setTodos(
+        todos.map((todo) => (todo.id === editId ? { ...todo, task: newTask } : todo))
+      );
+      setEditId(null);
+    } else {
+      setTodos([...todos, { id: Date.now(), task: newTask }]);
+    }
+    setNewTask("");
+  };
+
+  // Function to handle deleting a task
+  const handleDelete = (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
+
+  // Function to handle editing a task
+  const handleEdit = (id) => {
+    const todoToEdit = todos.find((todo) => todo.id === id);
+    setNewTask(todoToEdit.task);
+    setEditId(id);
+  };
+
+  // Function to save tasks to localStorage
+  const handleSave = () => {
+    localStorage.setItem('todos', JSON.stringify(todos));
+    alert("Tasks saved!");
+  };
+
+  return (
+    <div className='TodoApp' style={{ padding: "20px" }}>
+      <h1>Todos List Web App</h1>
+      <div>
+        <input
+          type="text"
+          value={newTask}
+          onChange={(e) => setNewTask(e.target.value)}
+          placeholder="Add a new task"
+        />
+        <button onClick={handleAddOrUpdateTask}>
+          {editId ? "Update Task" : "Add Task"}
+        </button>
+      </div>
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id} style={{ margin: "10px 0" }}>
+            <span>{todo.task}</span>
+            <button className='btn btn-primary' onClick={() => handleEdit(todo.id)} style={{ marginLeft: "10px" }}>Edit</button>
+            <button className='btn btn-danger' onClick={() => handleDelete(todo.id)} style={{ marginLeft: "10px" }}>Delete</button>
+          </li>
+        ))}
+      </ul>
+      <button onClick={handleSave}>Save Tasks</button>
+    </div>
+  );
+};
+
+export default TodosApp;
+
+
+
+
+
+
+/* App.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+.TodoApp {
+  max-width: 700px;
+  margin: 50px auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+}
+
+input {
+  width: 70%;
+  padding: 10px;
+  margin-right: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+button {
+  padding: 10px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+li span {
+  font-size: 16px;
+  color: #333;
+}
+
+li button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+li button:hover {
+  background-color: #0056b3;
+}
